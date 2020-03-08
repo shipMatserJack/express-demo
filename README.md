@@ -11,7 +11,7 @@ url-->网络传输-->dns解析-->目标服务器
 ## 通过 uri --> 路径
 www.baidu.com/a/b/c.html
 
-## 1.需要定义以恶搞 api/路由 需要满足客户端无论使用什么请求方式 （get/post/delete/path)... 都可以响应
+## 1.需要定义 api/路由 需要满足客户端无论使用什么请求方式 （get/post/delete/path)... 都可以响应
 
 1. app.all
   app.all('/demo', (req, res)=>{})

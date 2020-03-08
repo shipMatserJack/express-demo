@@ -1,21 +1,52 @@
 const express = require('express');
-
 // 是一个express实例
 const app = express();
+// 引入/注册路由
+const memberRouter = require('./member.router');
+const skuRouter = require('./sku.router');
+app.use('/member', memberRouter);
+app.use('/sku', skuRouter);
 
-const models = require('../models');//模型对象
-
-
-
-app.get('/create', async(res, req) => {
+/**
+ * @desc 模型对象（sequliaze集成和使用）
+ */
+const models = require('../models');
+//1.创建用户
+app.get('/create', async(req, res) => {
   let { name } = req.query;
+  // promise  user-->sequlize对象
   let user = await models.User.create({
     name
   })
   console.log(user);
   res.json({
-    message: '服务创建成功'
+    message: '服务创建成功',
+    user
   })
+})
+//2.获取所有用户
+app.get('/list', async(req, res) => {
+  let list  = await models.User.findAll();
+  res.json({
+    list
+  })
+})
+//3.获取某个用户
+app.get('/detail/:id', async(req, res) => {
+  let { id } = req.params;
+  let user = await models.User.findOne({
+    where: {
+      id
+    }
+  })
+  res.json({
+    user
+  })
+})
+
+
+app.listen(3000, () => {
+  console.log('服务启动了');
 })
 
 
@@ -31,14 +62,6 @@ app.get('/create', async(res, req) => {
 
 
 
-
-
-
-// 引入/注册路由
-// const memberRouter = require('./member.router');
-// const skuRouter = require('./sku.router');
-// app.use('/member', memberRouter);
-// app.use('/sku', skuRouter);
 
 function demo_middleware(err, req, res, next) {
   // 1. 异常
@@ -46,27 +69,18 @@ function demo_middleware(err, req, res, next) {
   // 3. 响应请求--结束响应-->当作路由处理函数
 }
 
-// function valid_name_middleware(req, res, next) {
-//   let {name} = req.query;
-//   if(!name || !name.length) {
-//     res.json({
-//       message: '缺少name参数'
-//     })
-//   }else {
-//     next();
-//   }
-// }
+function valid_name_middleware(req, res, next) {
+  let { name } = req.query;
+  if(!name || !name.length) {
+    res.json({
+      message: '缺少name参数'
+    })
+  }else {
+    next();
+  }
+}
 
-// app.all('*', valid_name_middleware)
-
-app.get('/test', (req, res) => {
-  res.json({
-    message: 'test'
-  })
-})
-app.listen(3000, () => {
-  console.log('服务启动了');
-})
+app.all('*', valid_name_middleware)
 
 // app.use('/demo', (req, res) => {
 //   res.json({
